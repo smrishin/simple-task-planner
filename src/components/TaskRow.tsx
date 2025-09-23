@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { FC } from "react";
 
 export interface Task {
   start: string;
@@ -16,7 +16,7 @@ interface TaskRowProps {
   onDelete: () => void;
 }
 
-const TaskRow: React.FC<TaskRowProps> = ({ task, onChange, onDelete }) => {
+const TaskRow: FC<TaskRowProps> = ({ task, onChange, onDelete }) => {
   if (task.deleted) return null;
 
   const handleChange = (field: keyof Task, value: string | boolean) => {

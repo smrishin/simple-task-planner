@@ -1,79 +1,41 @@
 "use client";
-import React from "react";
-import Link from "next/link";
-import { Task } from "../components/TaskRow";
-import { useToast } from "../components/ToastProvider";
+import { useState } from "react";
 
-const ViewPage: React.FC = () => {
-  const today = new Date().toISOString().split("T")[0];
-  const [date, setDate] = React.useState<string>(today);
-  const [tasks, setTasks] = React.useState<Task[]>([]);
-  const { showToast } = useToast();
+export default function LoginPage() {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
 
-  React.useEffect(() => {
-    fetch(`/api/tasks?date=${date}`)
-      .then((res) => res.json())
-      .then(setTasks);
-  }, [date]);
-
-  const toggleDone = async (index: number) => {
-    const updated = [...tasks];
-    updated[index].done = !updated[index].done;
-    setTasks(updated);
-    await fetch("/api/tasks", {
+  const handleSubmit = async () => {
+    const res = await fetch("/api/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, tasks: updated })
+      body: JSON.stringify({ code })
     });
-    showToast("Task updated");
+
+    if (res.ok) {
+      document.cookie = "access=granted; path=/";
+      window.location.href = "/view";
+    } else {
+      setError("Invalid code");
+    }
   };
 
   return (
-    <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <nav className="mb-4 flex gap-4">
-        <span className="font-bold text-indigo-400">View</span>
-        <Link href="/edit" className="hover:text-indigo-400">
-          Edit
-        </Link>
-      </nav>
-
-      <h2 className="text-2xl font-bold mb-4">View Tasks</h2>
-      <div className="mb-4">
-        <input
-          type="date"
-          className="bg-gray-700 text-white p-2 rounded"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      </div>
-      <ul className="space-y-2">
-        {tasks.map((t, idx) => (
-          <li
-            key={idx}
-            className="bg-gray-800 p-3 rounded-lg shadow-md flex justify-between items-center"
-          >
-            <div>
-              <b>
-                {t.start} - {t.end}
-              </b>
-              : {t.task} ({t.description})
-            </div>
-            <div className="flex items-center gap-2">
-              {t.done && <span className="text-green-400">✔️</span>}
-              <button
-                className={`px-3 py-1 rounded ${
-                  t.done ? "bg-green-600" : "bg-blue-600"
-                }`}
-                onClick={() => toggleDone(idx)}
-              >
-                {t.done ? "Undo" : "Done"}
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <h1 className="text-2xl mb-4">Enter Access Code</h1>
+      <input
+        type="password"
+        className="p-2 rounded bg-gray-700 mb-2"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <button
+        className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
+        onClick={handleSubmit}
+      >
+        Submit
+      </button>
+      {error && <p className="text-red-400 mt-2">{error}</p>}
     </div>
   );
-};
-
-export default ViewPage;
+}

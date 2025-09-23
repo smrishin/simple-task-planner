@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simple Task Planner
 
-## Getting Started
+A personal task planner built with **Next.js 15, TailwindCSS, and Upstash Redis** deployed on **Vercel**.  
+It lets you create daily task lists, mark them done, and save them across devices.
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- Two pages:
+  - `/` → View tasks (read-only, sorted by start time)
+  - `/edit` → Edit tasks (add, update, mark done, soft delete, save)
+- Data persistence with Upstash Redis (via Vercel Integration)
+- Dark mode UI with TailwindCSS
+- Toast notifications for saves and updates
+- Secrets-protected access (requires a code to enter)
+
+---
+
+## 🔧 Local Development
+
+1. Clone the repo
+   ```bash
+   git clone https://github.com/smrishin/simple-task-planner.git
+   cd task-manager-next
+   ```
+2. Install dependencies
+
+```bash
+npm install
+```
+
+3. Create a .env.local file and add:
+
+```env
+SIMPLE_TASK_PLANNER_STORAGE_KV_REST_API_URL=<your-upstash-url>
+SIMPLE_TASK_PLANNER_STORAGE_KV_REST_API_TOKEN=<your-upstash-token>
+ACCESS_CODE=your-secret-code
+```
+
+4. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Deployment on Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push the project to GitHub.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Import the repo into Vercel.
 
-## Learn More
+3. Add Upstash Redis from the Vercel Marketplace.
 
-To learn more about Next.js, take a look at the following resources:
+4. Vercel injects storage env vars automatically:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   - SIMPLE_TASK_PLANNER_STORAGE_KV_REST_API_URL
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   - SIMPLE_TASK_PLANNER_STORAGE_KV_REST_API_TOKEN
 
-## Deploy on Vercel
+5. Add your own access code:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   - ACCESS_CODE=your-secret-code
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Redeploy, then access your app at the Vercel-provided domain.
+
+## 🔐 Access Protection
+
+This app requires a secret access code (set via env vars).
+Users must enter the correct code to unlock the app; until then:
+
+- No pages are accessible
+
+- No DB reads/writes are made

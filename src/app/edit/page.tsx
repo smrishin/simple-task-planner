@@ -1,16 +1,16 @@
 "use client";
-import React from "react";
+import { useState, useEffect, FC } from "react";
 import Link from "next/link";
-import TaskRow, { Task } from "../../components/TaskRow";
-import { useToast } from "../../components/ToastProvider";
+import TaskRow, { Task } from "@/components/TaskRow";
+import { useToast } from "@/components/ToastProvider";
 
-const EditPage: React.FC = () => {
+const EditPage: FC = () => {
   const today = new Date().toISOString().split("T")[0];
-  const [date, setDate] = React.useState<string>(today);
-  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [date, setDate] = useState<string>(today);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const { showToast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetch(`/api/tasks?date=${date}`)
       .then((res) => res.json())
       .then(setTasks);
@@ -53,13 +53,6 @@ const EditPage: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <nav className="mb-4 flex gap-4">
-        <Link href="/" className="hover:text-indigo-400">
-          View
-        </Link>
-        <span className="font-bold text-indigo-400">Edit</span>
-      </nav>
-
       <h2 className="text-2xl font-bold mb-4">Edit Tasks</h2>
       <div className="flex gap-2 mb-4">
         <input

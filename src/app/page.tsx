@@ -13,7 +13,6 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      document.cookie = "access=granted; path=/";
       window.location.href = "/view";
     } else {
       setError("Invalid code");

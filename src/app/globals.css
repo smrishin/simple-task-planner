@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Masking for numeric input while keeping numeric keypad (non-standard) */
+.masked-input {
+  /* WebKit browsers (Safari, Chrome on iOS) */
+  -webkit-text-security: disc;
+}
+
+/* Fallback: make text same color as background (less secure but visual) */
+.masked-input.fallback {
+  color: transparent;
+  text-shadow: 0 0 0 var(--foreground);
+}

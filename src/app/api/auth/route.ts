@@ -4,7 +4,9 @@ export async function POST(request: Request) {
   const { code } = await request.json();
 
   if (code === process.env.ACCESS_CODE) {
-    const res = NextResponse.json({ ok: true });
+    // Create a redirect response to /view and set the cookie on it
+    const redirectUrl = new URL("/view", request.url);
+    const res = NextResponse.redirect(redirectUrl);
 
     // Set cookie for 24 hours
     res.cookies.set("access", "granted", {

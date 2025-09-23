@@ -5,7 +5,8 @@ import {
   useState,
   useEffect,
   ReactNode,
-  useMemo
+  useMemo,
+  useCallback
 } from "react";
 import { Task } from "@/components/TaskRow";
 
@@ -23,22 +24,51 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 const getLocalDate = () => new Date().toLocaleDateString("en-CA");
 
+// Simple unique id generator: timestamp + random.
+const genId = () =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+
+const ensureIds = (tasks: Task[]) =>
+  tasks.map((t) => ({ ...t, id: t.id ?? genId() }));
+
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [date, setDate] = useState<string>(getLocalDate());
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const refreshTasks = async () => {
+  const refreshTasks = useCallback(async () => {
     const res = await fetch(`/api/tasks?date=${date}`);
     const data = await res.json();
-    setTasks(data);
-  };
+    setTasks(ensureIds(Array.isArray(data) ? data : []));
+  }, [date]);
 
   useEffect(() => {
     refreshTasks();
-  }, [date]);
+  }, [refreshTasks]);
 
-  const activeTasks = useMemo(() => tasks.filter((t) => !t.deleted), [tasks]);
-  const deletedTasks = useMemo(() => tasks.filter((t) => t.deleted), [tasks]);
+  const minutesFrom = (time: string) => {
+    if (!time || typeof time !== "string") return Number.POSITIVE_INFINITY;
+    const parts = time.split(":");
+    const h = parseInt(parts[0] ?? "", 10);
+    const m = parseInt(parts[1] ?? "", 10);
+    if (Number.isNaN(h) || Number.isNaN(m)) return Number.POSITIVE_INFINITY;
+    return h * 60 + m;
+  };
+
+  const compareByStart = (a: Task, b: Task) => {
+    const am = minutesFrom(a.start);
+    const bm = minutesFrom(b.start);
+    return am - bm;
+  };
+
+  const activeTasks = useMemo(
+    () => tasks.filter((t) => !t.deleted).slice().sort(compareByStart),
+    [tasks]
+  );
+
+  const deletedTasks = useMemo(
+    () => tasks.filter((t) => t.deleted).slice().sort(compareByStart),
+    [tasks]
+  );
 
   return (
     <TaskContext.Provider

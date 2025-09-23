@@ -17,6 +17,9 @@ const EditPage: FC = () => {
     setDraftTasks([
       ...draftTasks,
       {
+        id: `${Date.now().toString(36)}-${Math.random()
+          .toString(36)
+          .slice(2, 9)}`,
         start: "",
         end: "",
         task: "",
@@ -27,41 +30,60 @@ const EditPage: FC = () => {
     ]);
   };
 
-  const updateTask = (index: number, updated: Task, isDraft = false) => {
+  const updateTask = (
+    identifier: number | string,
+    updated: Task,
+    isDraft = false
+  ) => {
     if (isDraft) {
+      const idx = draftTasks.findIndex((d) => d.id === identifier);
+      if (idx === -1) return;
       const newDrafts = [...draftTasks];
-      newDrafts[index] = updated;
+      newDrafts[idx] = updated;
       setDraftTasks(newDrafts);
     } else {
+      const idx = tasks.findIndex((t) => t.id === identifier);
+      if (idx === -1) return;
       const newTasks = [...tasks];
-      newTasks[index] = updated;
+      newTasks[idx] = updated;
       setTasks(newTasks);
     }
   };
 
-  const deleteTask = (index: number, isDraft = false) => {
+  const deleteTask = (identifier: number | string, isDraft = false) => {
     if (isDraft) {
+      const idx = draftTasks.findIndex((d) => d.id === identifier);
+      if (idx === -1) return;
       const newDrafts = [...draftTasks];
-
-      newDrafts.splice(index, 1);
-
+      newDrafts.splice(idx, 1);
       setDraftTasks(newDrafts);
     } else {
+      const idx = tasks.findIndex((t) => t.id === identifier);
+      if (idx === -1) return;
       const newTasks = [...tasks];
-      newTasks[index].deleted = true;
+      newTasks[idx] = { ...newTasks[idx], deleted: true };
       setTasks(newTasks);
     }
   };
 
   const saveTasks = async () => {
     const mergedTasks = [...tasks, ...draftTasks];
-    setTasks(mergedTasks);
+
+    // Filter out tasks missing required fields (start or task)
+    const validTasks = mergedTasks.filter((t) => {
+      const hasStart = typeof t.start === "string" && t.start.trim() !== "";
+      const hasTask = typeof t.task === "string" && t.task.trim() !== "";
+      return hasStart && hasTask;
+    });
+
+    // Update context and clear drafts with only valid tasks
+    setTasks(validTasks);
     setDraftTasks([]);
 
     await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, tasks: mergedTasks })
+      body: JSON.stringify({ date, tasks: validTasks })
     });
     showToast("Tasks saved");
   };
@@ -70,7 +92,7 @@ const EditPage: FC = () => {
     <div className="p-6 bg-gray-900 min-h-screen text-white">
       <h2 className="text-2xl font-bold mb-4">Modify Tasks</h2>
       <div className="flex flex-col items-center gap-10">
-        <div className="flex justify-between w-full">
+        <div className="flex justify-between items-end w-full">
           <DatePicker date={date} onDateChange={setDate} />
           <button
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded"
@@ -81,24 +103,38 @@ const EditPage: FC = () => {
         </div>
         <div className="w-full">
           {/* Existing tasks */}
-          {activeTasks.map((task, idx) => (
+          {activeTasks.map((task) => (
             <TaskRow
-              key={`existing-${idx}`}
+              key={task.id}
               task={task}
-              onChange={(t) => updateTask(idx, t)}
-              onDelete={() => deleteTask(idx)}
+              onChange={(t) => updateTask(task.id, t)}
+              onDelete={() => deleteTask(task.id)}
             />
           ))}
 
           {/* Draft tasks */}
-          {draftTasks.map((task, idx) => (
-            <TaskRow
-              key={`draft-${idx}`}
-              task={task}
-              onChange={(t) => updateTask(idx, t, true)}
-              onDelete={() => deleteTask(idx, true)}
-            />
-          ))}
+          {draftTasks
+            .slice()
+            .sort((a, b) => {
+              const toMinutes = (s: string) => {
+                if (!s) return Number.POSITIVE_INFINITY;
+                const [hh, mm] = s.split(":");
+                const h = parseInt(hh || "", 10);
+                const m = parseInt(mm || "", 10);
+                if (Number.isNaN(h) || Number.isNaN(m))
+                  return Number.POSITIVE_INFINITY;
+                return h * 60 + m;
+              };
+              return toMinutes(a.start) - toMinutes(b.start);
+            })
+            .map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                onChange={(t) => updateTask(task.id, t, true)}
+                onDelete={() => deleteTask(task.id, true)}
+              />
+            ))}
         </div>
         <button
           className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 rounded"

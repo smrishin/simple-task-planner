@@ -7,8 +7,10 @@ export default function NavBar() {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    document.cookie = "access=; Max-Age=0; path=/";
-    window.location.href = "/";
+    fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+      // redirect after server clears cookie
+      window.location.href = "/";
+    });
   };
 
   return (
@@ -40,6 +42,15 @@ export default function NavBar() {
         }`}
       >
         Edit
+      </Link>
+
+      <Link
+        href="/deleted"
+        className={`hover:text-indigo-400 ${
+          pathname === "/deleted" ? "text-indigo-400 font-bold" : ""
+        }`}
+      >
+        Deleted
       </Link>
 
       {/* Logout */}

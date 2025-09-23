@@ -8,9 +8,11 @@ const ViewPage: FC = () => {
   const { date, setDate, tasks, setTasks, activeTasks } = useTasks();
   const { showToast } = useToast();
 
-  const toggleDone = async (index: number) => {
+  const toggleDone = async (id: string) => {
+    const idx = tasks.findIndex((t) => t.id === id);
+    if (idx === -1) return;
     const updated = [...tasks];
-    updated[index].done = !updated[index].done;
+    updated[idx] = { ...updated[idx], done: !updated[idx].done };
     setTasks(updated);
     await fetch("/api/tasks", {
       method: "POST",
@@ -27,32 +29,48 @@ const ViewPage: FC = () => {
         <DatePicker date={date} onDateChange={setDate} />
       </div>
       <ul className="space-y-2">
-        {activeTasks.map((t, idx) => (
-          <li
-            key={idx}
-            className="bg-gray-800 p-3 rounded-lg shadow-md flex justify-between items-center"
-          >
-            <div>
-              <b>
-                {t.start} - {t.end}
-              </b>
-              : {t.task} ({t.description})
-            </div>
-            <div className="flex items-center gap-2">
-              {t.done && <span className="text-green-400">✔️</span>}
-              <button
-                className={`px-3 py-1 rounded transition-colors duration-200 ${
-                  t.done
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-                onClick={() => toggleDone(idx)}
-              >
-                {t.done ? "Undo" : "Done"}
-              </button>
-            </div>
-          </li>
-        ))}
+        {activeTasks.map((t) => {
+          const to12 = (time: string) => {
+            if (!time) return "";
+            // expect HH:MM
+            const [hh, mm] = time.split(":");
+            const h = parseInt(hh, 10);
+            if (Number.isNaN(h) || Number.isNaN(parseInt(mm || "0", 10)))
+              return time;
+            const suffix = h >= 12 ? "pm" : "am";
+            const hour = ((h + 11) % 12) + 1; // convert 0->12,13->1 etc
+            return `${hour}:${mm} ${suffix}`;
+          };
+
+          return (
+            <li
+              key={t.id}
+              className={`bg-gray-800 p-3 rounded-lg shadow-md flex justify-between items-center ${
+                t.done ? "bg-green-800" : "bg-gray-800"
+              }`}
+            >
+              <div>
+                <b>
+                  {to12(t.start)} - {to12(t.end)}
+                </b>
+                : {t.task} ({t.description})
+              </div>
+              <div className="flex items-center gap-2">
+                {t.done && <span className="text-green-400">✔️</span>}
+                <button
+                  className={`px-3 py-1 rounded transition-colors duration-200 ${
+                    t.done
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                  onClick={() => toggleDone(t.id)}
+                >
+                  {t.done ? "Undo" : "Done"}
+                </button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

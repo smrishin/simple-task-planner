@@ -32,11 +32,41 @@ const DeletedPage: FC = () => {
     return `${hour}:${mm} ${suffix}`;
   };
 
+  const deleteAllPermanently = async () => {
+    if (!deletedTasks || deletedTasks.length === 0) {
+      showToast("Nothing to delete");
+      return;
+    }
+
+    if (
+      !confirm(
+        "Permanently delete ALL deleted tasks for this date? This cannot be undone."
+      )
+    )
+      return;
+
+    // Remove deleted tasks locally and persist remaining tasks
+    const remaining = tasks.filter((t) => !t.deleted);
+    setTasks(remaining);
+    await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date, tasks: remaining })
+    });
+    showToast("Permanently deleted all trashed tasks for this date");
+  };
+
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
       <h2 className="text-2xl font-bold mb-4">Deleted Tasks</h2>
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex gap-2 items-center">
         <DatePicker date={date} onDateChange={setDate} />
+        <button
+          className="ml-auto px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
+          onClick={deleteAllPermanently}
+        >
+          Delete All Permanently
+        </button>
       </div>
       <ul className="space-y-2">
         {deletedTasks.map((t) => (

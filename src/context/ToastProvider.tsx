@@ -12,7 +12,7 @@ export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(""), 2000);
+    setTimeout(() => setToast(""), 4000);
   };
 
   return (

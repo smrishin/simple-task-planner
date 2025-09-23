@@ -29,7 +29,8 @@ const ViewPage: FC = () => {
         <DatePicker date={date} onDateChange={setDate} />
       </div>
 
-      <div className="overflow-auto bg-gray-800 rounded-lg shadow-md">
+      {/* Desktop / wide screens: table */}
+      <div className="hidden md:block overflow-auto bg-gray-800 rounded-lg shadow-md">
         <table className="min-w-full table-auto text-left">
           <thead className="bg-gray-700">
             <tr>
@@ -108,6 +109,72 @@ const ViewPage: FC = () => {
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile / small screens: stacked cards for better UX */}
+      <div className="block md:hidden space-y-3">
+        {activeTasks.length === 0 && (
+          <div className="px-4 py-6 text-center text-gray-400">
+            No tasks for this date.
+          </div>
+        )}
+
+        {activeTasks.map((t) => {
+          const to12 = (time: string) => {
+            if (!time) return "";
+            const [hh, mm] = time.split(":");
+            const h = parseInt(hh, 10);
+            if (Number.isNaN(h) || Number.isNaN(parseInt(mm || "0", 10)))
+              return time;
+            const suffix = h >= 12 ? "pm" : "am";
+            const hour = ((h + 11) % 12) + 1;
+            return `${hour}:${mm} ${suffix}`;
+          };
+
+          return (
+            <div
+              key={t.id}
+              className={`p-3 rounded-lg shadow-md ${
+                t.done ? "bg-green-900" : "bg-gray-800"
+              }`}
+            >
+              <div className="flex justify-between items-start gap-2">
+                <div>
+                  <div className="font-medium">
+                    {to12(t.start)}
+                    {t.end ? (
+                      <span className="text-sm text-gray-300">
+                        {" "}
+                        - {to12(t.end)}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="text-lg">{t.task}</div>
+                  <div className="text-gray-300">{t.description}</div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-sm">
+                    {t.done ? (
+                      <span className="text-green-200">✔️ Done</span>
+                    ) : (
+                      <span className="text-yellow-200">Pending</span>
+                    )}
+                  </div>
+                  <button
+                    className={`px-3 py-1 rounded ${
+                      t.done
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                    onClick={() => toggleDone(t.id)}
+                  >
+                    {t.done ? "Undo" : "Done"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

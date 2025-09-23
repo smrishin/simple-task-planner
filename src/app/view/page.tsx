@@ -1,21 +1,12 @@
 "use client";
-import { useState, useEffect, FC } from "react";
-import { Task } from "@/components/TaskRow";
-import { useToast } from "@/components/ToastProvider";
+import { FC } from "react";
+import { useTasks } from "@/context/TaskProvider";
+import { useToast } from "@/context/ToastProvider";
 import DatePicker from "@/components/DatePicker";
 
 const ViewPage: FC = () => {
-  const [date, setDate] = useState<string>(
-    new Date().toLocaleDateString("en-US")
-  );
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { date, setDate, tasks, setTasks, activeTasks } = useTasks();
   const { showToast } = useToast();
-
-  useEffect(() => {
-    fetch(`/api/tasks?date=${date}`)
-      .then((res) => res.json())
-      .then(setTasks);
-  }, [date]);
 
   const toggleDone = async (index: number) => {
     const updated = [...tasks];
@@ -36,7 +27,7 @@ const ViewPage: FC = () => {
         <DatePicker date={date} onDateChange={setDate} />
       </div>
       <ul className="space-y-2">
-        {tasks.map((t, idx) => (
+        {activeTasks.map((t, idx) => (
           <li
             key={idx}
             className="bg-gray-800 p-3 rounded-lg shadow-md flex justify-between items-center"

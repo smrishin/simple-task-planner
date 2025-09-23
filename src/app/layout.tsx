@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { ToastProvider } from "@/components/ToastProvider";
+import { TaskProvider } from "@/context/TaskProvider";
+import { ToastProvider } from "@/context/ToastProvider";
 import NavBar from "@/components/Navbar";
 
 export const metadata: Metadata = {
@@ -20,8 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-gray-900 text-white">
         <ToastProvider>
-          {!isLoginPage && <NavBar />}
-          {children}
+          <TaskProvider>
+            {!isLoginPage && <NavBar />}
+            {children}
+          </TaskProvider>
         </ToastProvider>
       </body>
     </html>

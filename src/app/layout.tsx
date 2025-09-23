@@ -7,7 +7,10 @@ import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Nan Task Planner",
-  description: "Rishi's Simple Task Planner"
+  description: "Rishi's Simple Task Planner",
+  icons: {
+    icon: "/favicon.svg"
+  }
 };
 
 export default async function RootLayout({
@@ -25,6 +28,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* explicit favicon links for better browser compatibility */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body className="bg-gray-900 text-white">
         <ToastProvider>
           <TaskProvider>

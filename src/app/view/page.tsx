@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect, FC } from "react";
-import Link from "next/link";
 import { Task } from "@/components/TaskRow";
 import { useToast } from "@/components/ToastProvider";
+import DatePicker from "@/components/DatePicker";
 
 const ViewPage: FC = () => {
-  const today = new Date().toISOString().split("T")[0];
-  const [date, setDate] = useState<string>(today);
+  const [date, setDate] = useState<string>(
+    new Date().toLocaleDateString("en-US")
+  );
   const [tasks, setTasks] = useState<Task[]>([]);
   const { showToast } = useToast();
 
@@ -31,13 +32,8 @@ const ViewPage: FC = () => {
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
       <h2 className="text-2xl font-bold mb-4">View Tasks</h2>
-      <div className="mb-4">
-        <input
-          type="date"
-          className="bg-gray-700 text-white p-2 rounded"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+      <div className="mb-4 flex gap-2">
+        <DatePicker date={date} onDateChange={setDate} />
       </div>
       <ul className="space-y-2">
         {tasks.map((t, idx) => (
@@ -54,8 +50,10 @@ const ViewPage: FC = () => {
             <div className="flex items-center gap-2">
               {t.done && <span className="text-green-400">✔️</span>}
               <button
-                className={`px-3 py-1 rounded ${
-                  t.done ? "bg-green-600" : "bg-blue-600"
+                className={`px-3 py-1 rounded transition-colors duration-200 ${
+                  t.done
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
                 onClick={() => toggleDone(idx)}
               >

@@ -4,8 +4,8 @@ import { ToastProvider } from "@/components/ToastProvider";
 import NavBar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Task Manager",
-  description: "Simple task manager with Next.js + Redis"
+  title: "Nan Task Planner",
+  description: "Rishi's Simple Task Planner"
 };
 
 export default function RootLayout({

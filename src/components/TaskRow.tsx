@@ -24,7 +24,7 @@ const TaskRow: FC<TaskRowProps> = ({ task, onChange, onDelete }) => {
   };
 
   return (
-    <div className="flex gap-2 mb-2 bg-gray-800 p-3 rounded-lg shadow-md">
+    <div className="flex flex-wrap gap-2 mb-2 bg-gray-800 p-3 rounded-lg shadow-md">
       <input
         type="time"
         className="bg-gray-700 text-white p-2 rounded"

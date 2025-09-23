@@ -9,6 +9,9 @@ export interface Task {
   description: string;
   done: boolean;
   deleted: boolean;
+  // stagedDeleted is a temporary client-only flag used in the Edit page
+  // to mark items that will be deleted when the user hits Save.
+  stagedDeleted?: boolean;
 }
 
 interface TaskRowProps {
@@ -25,7 +28,13 @@ const TaskRow: FC<TaskRowProps> = ({ task, onChange, onDelete }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mb-2 bg-gray-800 p-3 rounded-lg shadow-md">
+    <div
+      className={`flex flex-wrap gap-2 mb-2 p-3 rounded-lg shadow-md ${
+        task.stagedDeleted
+          ? "bg-red-800/20 border border-red-700/30"
+          : "bg-gray-800"
+      }`}
+    >
       <input
         type="time"
         className="bg-gray-700 text-white p-2 rounded"
@@ -64,10 +73,14 @@ const TaskRow: FC<TaskRowProps> = ({ task, onChange, onDelete }) => {
           {task.done ? "Undo" : "Done"}
         </button>
         <button
-          className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition-colors duration-200"
+          className={`px-3 py-1 rounded transition-colors duration-200 ${
+            task.stagedDeleted
+              ? "bg-yellow-600 hover:bg-yellow-700"
+              : "bg-red-600 hover:bg-red-700"
+          }`}
           onClick={onDelete}
         >
-          Delete
+          {task.stagedDeleted ? "Undo" : "Delete"}
         </button>
       </div>
     </div>

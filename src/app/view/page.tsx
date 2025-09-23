@@ -28,50 +28,87 @@ const ViewPage: FC = () => {
       <div className="mb-4 flex gap-2">
         <DatePicker date={date} onDateChange={setDate} />
       </div>
-      <ul className="space-y-2">
-        {activeTasks.map((t) => {
-          const to12 = (time: string) => {
-            if (!time) return "";
-            // expect HH:MM
-            const [hh, mm] = time.split(":");
-            const h = parseInt(hh, 10);
-            if (Number.isNaN(h) || Number.isNaN(parseInt(mm || "0", 10)))
-              return time;
-            const suffix = h >= 12 ? "pm" : "am";
-            const hour = ((h + 11) % 12) + 1; // convert 0->12,13->1 etc
-            return `${hour}:${mm} ${suffix}`;
-          };
 
-          return (
-            <li
-              key={t.id}
-              className={`bg-gray-800 p-3 rounded-lg shadow-md flex justify-between items-center ${
-                t.done ? "bg-green-800" : "bg-gray-800"
-              }`}
-            >
-              <div>
-                <b>
-                  {to12(t.start)} - {to12(t.end)}
-                </b>
-                : {t.task} ({t.description})
-              </div>
-              <div className="flex items-center gap-2">
-                {t.done && <span className="text-green-400">✔️</span>}
-                <button
-                  className={`px-3 py-1 rounded transition-colors duration-200 ${
-                    t.done
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }`}
-                  onClick={() => toggleDone(t.id)}
+      <div className="overflow-auto bg-gray-800 rounded-lg shadow-md">
+        <table className="min-w-full table-auto text-left">
+          <thead className="bg-gray-700">
+            <tr>
+              <th className="px-4 py-3">Time</th>
+              <th className="px-4 py-3">Task</th>
+              <th className="px-4 py-3">Description</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activeTasks.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
+                  No tasks for this date.
+                </td>
+              </tr>
+            )}
+
+            {activeTasks.map((t) => {
+              const to12 = (time: string) => {
+                if (!time) return "";
+                // expect HH:MM
+                const [hh, mm] = time.split(":");
+                const h = parseInt(hh, 10);
+                if (Number.isNaN(h) || Number.isNaN(parseInt(mm || "0", 10)))
+                  return time;
+                const suffix = h >= 12 ? "pm" : "am";
+                const hour = ((h + 11) % 12) + 1; // convert 0->12,13->1 etc
+                return `${hour}:${mm} ${suffix}`;
+              };
+
+              return (
+                <tr
+                  key={t.id}
+                  className={
+                    t.done ? "bg-green-900 odd:bg-green-800" : "odd:bg-gray-800"
+                  }
                 >
-                  {t.done ? "Undo" : "Done"}
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                  <td className="px-4 py-3 align-top font-medium">
+                    {to12(t.start)}
+                    {t.end ? (
+                      <span className="text-sm text-gray-300">
+                        {" "}
+                        - {to12(t.end)}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3 align-top">{t.task}</td>
+                  <td className="px-4 py-3 align-top text-gray-300">
+                    {t.description}
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    {t.done ? (
+                      <span className="inline-flex items-center gap-2 text-green-200">
+                        ✔️ Done
+                      </span>
+                    ) : (
+                      <span className="text-yellow-200">Pending</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    <button
+                      className={`px-3 py-1 rounded transition-colors duration-200 ${
+                        t.done
+                          ? "bg-green-600 hover:bg-green-700"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                      onClick={() => toggleDone(t.id)}
+                    >
+                      {t.done ? "Undo" : "Done"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

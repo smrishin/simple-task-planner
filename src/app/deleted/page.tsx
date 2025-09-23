@@ -42,7 +42,7 @@ const DeletedPage: FC = () => {
         {deletedTasks.map((t) => (
           <li
             key={t.id}
-            className={`bg-red-800 p-3 rounded-lg shadow-md flex justify-between items-center`}
+            className="bg-red-900/20 backdrop-blur-sm p-3 rounded-lg shadow-md flex justify-between items-center border border-red-700/30 text-white"
           >
             <div>
               <b>

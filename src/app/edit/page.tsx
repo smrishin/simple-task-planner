@@ -61,13 +61,25 @@ const EditPage: FC = () => {
       const idx = tasks.findIndex((t) => t.id === identifier);
       if (idx === -1) return;
       const newTasks = [...tasks];
-      newTasks[idx] = { ...newTasks[idx], deleted: true };
+      // Toggle a temporary stagedDeleted flag. Actual deletion is applied on Save.
+      newTasks[idx] = {
+        ...newTasks[idx],
+        stagedDeleted: !newTasks[idx].stagedDeleted
+      };
       setTasks(newTasks);
     }
   };
 
   const saveTasks = async () => {
-    const mergedTasks = [...tasks, ...draftTasks];
+    // When saving, convert any stagedDeleted flags into real deleted flags,
+    // then merge with drafts and persist only valid tasks.
+    // Preserve previously deleted items; only set deleted=true when stagedDeleted is true.
+    const committed = tasks.map((t) => ({
+      ...t,
+      deleted: !!t.deleted || !!t.stagedDeleted,
+      stagedDeleted: undefined
+    }));
+    const mergedTasks = [...committed, ...draftTasks];
 
     // Filter out tasks missing required fields (start or task)
     const validTasks = mergedTasks.filter((t) => {

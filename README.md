@@ -72,3 +72,9 @@ Users must enter the correct code to unlock the app; until then:
 - No pages are accessible
 
 - No DB reads/writes are made
+
+---
+
+## Favicon / Home-screen icon
+
+- The app uses `public/favicon.ico` for the site favicon and `public/app-icon.png` for home-screen (iOS) and PWA icons. If your icon doesn't show after deploy, try a hard-refresh or re-adding the site to your home screen.

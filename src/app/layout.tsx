@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Nan Task Planner",
   description: "Rishi's Simple Task Planner",
   icons: {
-    icon: "/favicon.svg"
+    icon: "/favicon.ico"
   }
 };
 
@@ -30,9 +30,19 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         {/* explicit favicon links for better browser compatibility */}
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="alternate icon" href="/favicon.svg" />
         <link rel="icon" href="/favicon.ico" />
+        {/* web app manifest for add-to-home-screen on Android/Chrome */}
+        <link rel="manifest" href="/manifest.webmanifest" />
+        {/* iOS / Safari: use app-icon.png (place a PNG in public/) for reliable home-screen icon */}
+        <link rel="apple-touch-icon" href="/app-icon.png" />
+        {/* PNG favicons as fallbacks (helpful on some hosts/browsers) */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/app-icon.png" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="192x192"
+          href="/app-icon.png"
+        />
       </head>
       <body className="bg-gray-900 text-white">
         <ToastProvider>

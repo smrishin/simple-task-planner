@@ -61,12 +61,20 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   };
 
   const activeTasks = useMemo(
-    () => tasks.filter((t) => !t.deleted).slice().sort(compareByStart),
+    () =>
+      tasks
+        .filter((t) => !t.deleted)
+        .slice()
+        .sort(compareByStart),
     [tasks]
   );
 
   const deletedTasks = useMemo(
-    () => tasks.filter((t) => t.deleted).slice().sort(compareByStart),
+    () =>
+      tasks
+        .filter((t) => t.deleted)
+        .slice()
+        .sort(compareByStart),
     [tasks]
   );
 

@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import TaskRow, { Task } from "@/components/TaskRow";
 import { FC, useState } from "react";
 
@@ -9,6 +10,7 @@ import { useToast } from "@/context/ToastProvider";
 const EditPage: FC = () => {
   const { date, setDate, tasks, setTasks, activeTasks } = useTasks();
   const { showToast } = useToast();
+  const router = useRouter();
 
   // Local draft state for new unsaved tasks
   const [draftTasks, setDraftTasks] = useState<Task[]>([]);
@@ -102,7 +104,15 @@ const EditPage: FC = () => {
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <h2 className="text-2xl font-bold mb-4">Modify Tasks</h2>
+      <div className="flex items-center justify-between pb-4">
+        <h2 className="text-2xl font-bold mb-4">Modify Tasks</h2>
+        <button
+          onClick={() => router.push("/deleted")}
+          className="h-10 px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+        >
+          Show Deleted
+        </button>
+      </div>
       <div className="flex flex-col items-center gap-10">
         <div className="flex justify-between items-end w-full">
           <DatePicker date={date} onDateChange={setDate} />

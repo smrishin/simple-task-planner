@@ -1,12 +1,15 @@
 "use client";
+
 import { FC } from "react";
 import { useTasks } from "@/context/TaskProvider";
 import { useToast } from "@/context/ToastProvider";
+import { useRouter } from "next/navigation";
 import DatePicker from "@/components/DatePicker";
 
 const DeletedPage: FC = () => {
   const { date, setDate, tasks, setTasks, deletedTasks } = useTasks();
   const { showToast } = useToast();
+  const router = useRouter();
 
   const undeleteTask = async (id: string) => {
     const idx = tasks.findIndex((t) => t.id === id);
@@ -58,8 +61,16 @@ const DeletedPage: FC = () => {
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <h2 className="text-2xl font-bold mb-4">Deleted Tasks</h2>
-      <div className="mb-4 flex gap-2 items-center">
+      <div className="flex items-center justify-between pb-4">
+        <h2 className="text-2xl font-bold mb-4">Deleted Tasks</h2>
+        <button
+          onClick={() => router.push("/edit")}
+          className="h-10 px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white"
+        >
+          Back to Edits
+        </button>
+      </div>
+      <div className="flex gap-2 items-end">
         <DatePicker date={date} onDateChange={setDate} />
         <button
           className="ml-auto px-4 py-2 bg-red-600 hover:bg-red-700 rounded"

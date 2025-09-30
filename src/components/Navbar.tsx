@@ -45,12 +45,12 @@ export default function NavBar() {
       </Link>
 
       <Link
-        href="/deleted"
+        href="/puffs"
         className={`hover:text-indigo-400 ${
-          pathname === "/deleted" ? "text-indigo-400 font-bold" : ""
+          pathname === "/puffs" ? "text-indigo-400 font-bold" : ""
         }`}
       >
-        Deleted
+        Puffs
       </Link>
 
       {/* Logout */}

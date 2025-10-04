@@ -7,11 +7,14 @@ interface DatePickerProps {
 }
 
 const getLocalDate = () => {
-  const d = new Date();
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return new Date().toLocaleDateString("en-CA");
+};
+
+const shiftDate = (dateStr: string, days: number) => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString("en-CA");
 };
 
 export default function DatePicker({ date, onDateChange }: DatePickerProps) {
@@ -34,6 +37,18 @@ export default function DatePicker({ date, onDateChange }: DatePickerProps) {
         value={date}
         onChange={(e) => onDateChange(e.target.value)}
       />
+      <button
+        className="px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded"
+        onClick={() => onDateChange(shiftDate(date, -1))}
+      >
+        &lt;
+      </button>
+      <button
+        className="px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded"
+        onClick={() => onDateChange(shiftDate(date, 1))}
+      >
+        &gt;
+      </button>
       <span className="text-gray-400 whitespace-nowrap">{timezone}</span>
       <button
         className="px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded"

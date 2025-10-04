@@ -9,22 +9,34 @@ import CONSTANTS from "@/constants";
 const PuffsPage: FC = () => {
   const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
   const [puffs, setPuffs] = useState(0);
+  const [saving, setSaving] = useState(false);
+
   const router = useRouter();
 
-  // useEffect(() => {
-  //   fetch(`/api/puffs?date=${date}`)
-  //     .then((res) => res.json())
-  //     .then((data) => setPuffs(data.count ?? 0));
-  // }, [date]);
+  useEffect(() => {
+    fetch(`/api/puffs?date=${date}`)
+      .then((res) => res.json())
+      .then((data) => setPuffs(data.count ?? 0));
+  }, [date]);
 
   const updatePuffs = async () => {
     console.log(`updatepuff log`);
-    setPuffs((prev) => prev + 1);
-    // await fetch("/api/puffs", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ date, count: puffs })
-    // });
+    if (saving) return;
+    setSaving(true);
+    try {
+      const next = puffs + 1;
+      setPuffs(next);
+      const res = await fetch("/api/puffs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, count: next, max: CONSTANTS.TOTAL_PUFFS })
+      });
+
+      const { data } = await res.json();
+      if (typeof data?.count === "number") setPuffs(data.count);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

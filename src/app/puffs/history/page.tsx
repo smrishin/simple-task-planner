@@ -14,24 +14,25 @@ export default function PuffHistory() {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth()); // 0-11
   const [year, setYear] = useState(today.getFullYear());
-  const [showPicker, setShowPicker] = useState(false);
   const router = useRouter();
 
   const [puffs, setPuffs] = useState<Record<string, DayData>>({});
 
   // Fetch from Redis API
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await fetch(`/api/puffs?year=${year}&month=${month + 1}`);
-  //     if (res.ok) {
-  //       const json: PuffHistoryResponse = await res.json();
-  //       setPuffs(json.data || {});
-  //     } else {
-  //       setPuffs({});
-  //     }
-  //   };
-  //   fetchData();
-  // }, [year, month]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(
+        `/api/puffs/history?year=${year}&month=${month + 1}`
+      );
+      if (res.ok) {
+        const json: PuffHistoryResponse = await res.json();
+        setPuffs(json.data || {});
+      } else {
+        setPuffs({});
+      }
+    };
+    fetchData();
+  }, [year, month]);
 
   const getDaysInMonth = (y: number, m: number) =>
     new Date(y, m + 1, 0).getDate();

@@ -4,6 +4,7 @@ import { getRedis } from "@/lib/redis";
 interface PuffEntry {
   count: number;
   max: number;
+  lastPuffAt?: string | null;
 }
 
 const KEY_PREFIX = "puffs:";

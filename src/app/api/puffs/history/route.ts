@@ -4,6 +4,7 @@ import { getRedis } from "@/lib/redis";
 interface PuffEntry {
   count: number;
   max: number;
+  firstPuffAt?: string | null;
   lastPuffAt?: string | null;
 }
 

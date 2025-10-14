@@ -5,6 +5,7 @@ import CONSTANTS from "@/constants";
 interface PuffEntry {
   count: number;
   max: number;
+  firstPuffAt?: string | null;
   lastPuffAt?: string | null;
 }
 
@@ -43,14 +44,16 @@ export async function GET(request: Request) {
       monthData[date] ?? {
         count: 0,
         max: CONSTANTS.TOTAL_PUFFS,
-        lastPuffAt: null
+        firstPuffAt: null,
+        lastPuffAt: null,
       }
     );
   } catch {
     return NextResponse.json({
       count: 0,
       max: CONSTANTS.TOTAL_PUFFS,
-      lastPuffAt: null
+      firstPuffAt: null,
+      lastPuffAt: null,
     });
   }
 }
@@ -80,13 +83,15 @@ export async function POST(request: Request) {
     const prev = existing[date] ?? {
       count: 0,
       max: CONSTANTS.TOTAL_PUFFS,
-      lastPuffAt: null
+      firstPuffAt: null,
+      lastPuffAt: null,
     };
 
     const updated: PuffEntry = {
       count: typeof count === "number" ? count : prev.count,
       max: typeof max === "number" ? max : prev.max,
-      lastPuffAt: new Date().toISOString()
+      firstPuffAt: prev.firstPuffAt ?? new Date().toISOString(),
+      lastPuffAt: new Date().toISOString(),
     };
 
     existing[date] = updated;
@@ -100,9 +105,10 @@ export async function POST(request: Request) {
       data: {
         count: count ?? 0,
         max: max ?? CONSTANTS.TOTAL_PUFFS,
-        lastPuffAt: new Date().toISOString()
+        firstPuffAt: null,
+        lastPuffAt: new Date().toISOString(),
       },
-      warning: "redis not configured"
+      warning: "redis not configured",
     });
   }
 }
